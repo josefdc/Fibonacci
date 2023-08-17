@@ -1,68 +1,27 @@
 #include <iostream>
+#include <chrono>
 #include <vector>
-#include <chrono>  // Inclusión de la librería para medir tiempo
+#include <omp.h>
 
-// Definición del tipo de matriz que contendrá números de tipo long double.
-typedef std::vector<std::vector<long double>> Matrix;
+std::vector<int> memoization;
 
-/**
- * @brief Multiplica dos matrices y devuelve el resultado.
- *
- * @param a Primera matriz.
- * @param b Segunda matriz.
- * @return Resultado de la multiplicación de matrices.
- */
-Matrix matrixMultiply(const Matrix &a, const Matrix &b) {
-    int n = a.size();
-    int m = b[0].size();
-    int p = b.size();
-    Matrix result(n, std::vector<long double>(m, 0));
-
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            for (int k = 0; k < p; ++k) {
-                result[i][j] += a[i][k] * b[k][j];
-            }
-        }
-    }
-
-    return result;
-}
-
-/**
- * @brief Eleva una matriz a una potencia usando exponenciación rápida.
- *
- * @param mat Matriz a elevar.
- * @param exp Exponente.
- * @return Matriz elevada a la potencia exp.
- */
-Matrix matrixPower(const Matrix &mat, int exp) {
-    if (exp == 1) {
-        return mat;
-    }
-    if (exp % 2 == 0) {
-        Matrix halfPower = matrixPower(mat, exp / 2);
-        return matrixMultiply(halfPower, halfPower);
-    } else {
-        Matrix halfPower = matrixPower(mat, (exp - 1) / 2);
-        return matrixMultiply(matrixMultiply(halfPower, halfPower), mat);
-    }
-}
-
-/**
- * @brief Calcula el n-ésimo número de Fibonacci usando exponenciación de matrices.
- *
- * @param n Posición del número de Fibonacci a calcular.
- * @return Número de Fibonacci en la posición n.
- */
-long double fibonacci(int n) {
+int parallel_fibonacci(int n) {
     if (n <= 1)
         return n;
 
-    Matrix base = {{1, 1}, {1, 0}};
-    Matrix result = matrixPower(base, n - 1);
+    if (memoization[n] != -1)
+        return memoization[n];
 
-    return result[0][0];
+    int fib1, fib2;
+#pragma omp task shared(fib1) // Create tasks for parallel computation
+    fib1 = parallel_fibonacci(n - 1);
+#pragma omp task shared(fib2)
+    fib2 = parallel_fibonacci(n - 2);
+#pragma omp taskwait // Wait for the tasks to complete
+
+    memoization[n] = fib1 + fib2; // Memoize the result
+
+    return memoization[n];
 }
 
 int main() {
@@ -70,17 +29,21 @@ int main() {
     std::cout << "Enter the value of n: ";
     std::cin >> n;
 
-    // Inicio de la medición del tiempo
-    auto start = std::chrono::high_resolution_clock::now();
+    memoization.assign(n + 1, -1); // Initialize memoization array
+    memoization[0] = 0;
+    memoization[1] = 1;
 
-    long double fibNumber = fibonacci(n);
+    auto start = std::chrono::high_resolution_clock::now(); // Record the start time
 
-    // Fin de la medición del tiempo
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+#pragma omp parallel
+#pragma omp single
+    int fibNumber = parallel_fibonacci(n);
+
+    auto end = std::chrono::high_resolution_clock::now(); // Record the end time
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start); // Calculate the execution time
 
     std::cout << "Fibonacci number at position " << n << ": " << fibNumber << std::endl;
-    std::cout << "Time taken by function: " << duration.count() << " microseconds" << std::endl;
+    std::cout << "Execution time: " << duration.count() << " microseconds" << std::endl;
 
     return 0;
 }
