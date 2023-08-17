@@ -46,25 +46,18 @@ long double fibonacci(int n) {
     return result[0][0];
 }
 
-int maxDigitsLongDouble() {
-    // Usamos la base 10 para calcular el número máximo de dígitos que puede representar un long double
-    return -std::log10(std::numeric_limits<long double>::epsilon());
-}
-
 int main() {
     int n;
     std::cout << "Enter the value of n: ";
     std::cin >> n;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now(); // Record the start time
     long double fibNumber = fibonacci(n);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    auto stop = std::chrono::high_resolution_clock::now(); // Record the end time
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start); // Calculate the execution time
 
     std::cout << "Fibonacci number at position " << n << ": " << fibNumber << std::endl;
     std::cout << "Time taken by function: " << duration.count() << " microseconds" << std::endl;
-
-    std::cout << "Maximum number of digits a long double can represent accurately: " << maxDigitsLongDouble() << std::endl;
 
     return 0;
 }

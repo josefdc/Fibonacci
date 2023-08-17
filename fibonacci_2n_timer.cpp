@@ -20,9 +20,9 @@ int main() {
     std::cout << "Fibonacci(" << n << ") = " << fibonacci(n) << std::endl;
 
     auto end = std::chrono::high_resolution_clock::now();    // Record the end time
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start); // Calculate the execution time
 
-    std::cout << "Execution time: " << duration.count() << " microseconds" << std::endl;
+    std::cout << "Execution time: " << duration.count() << " microseconds" << std::endl; 
 
     return 0;
 }
