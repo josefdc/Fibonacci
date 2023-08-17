@@ -24,6 +24,7 @@ Matrix matrixMultiply(const Matrix &a, const Matrix &b) {
     return result;
 }
 
+// Matrix Power
 Matrix matrixPower(const Matrix &mat, int exp) {
     if (exp == 1) {
         return mat;
@@ -42,10 +43,15 @@ long double fibonacci(int n) {
         return n;
 
     Matrix base = {{1, 1}, {1, 0}};
+
+    // We calculate the matrix raised to the power (n - 1).
+    // This gives us a matrix with the necessary Fibonacci numbers.
     Matrix result = matrixPower(base, n - 1);
 
+    // The Fibonacci number at position n is in the upper left corner of the matrix.
     return result[0][0];
 }
+
 
 int main() {
     int n;
