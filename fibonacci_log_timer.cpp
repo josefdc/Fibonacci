@@ -6,6 +6,7 @@
 
 typedef std::vector<std::vector<long double>> Matrix;
 
+// Matrix multiplication
 Matrix matrixMultiply(const Matrix &a, const Matrix &b) {
     int n = a.size();
     int m = b[0].size();
