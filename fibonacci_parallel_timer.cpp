@@ -26,8 +26,8 @@ mpz_class parallel_fibonacci(int n) {
 }
 
 int main() {
-    // Lista de valores recomendados para medir
-    std::vector<int> values = {5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000};
+    // Lista de valores intermedios para medir
+    std::vector<int> values = {5, 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000};
 
     for (int n : values) {
         memoization.assign(n + 1, -1); // Initialize memoization array
